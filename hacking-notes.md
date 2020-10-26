@@ -2,7 +2,7 @@
 - ## Shell Stabilisation ##
 In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
 
-  - ### PYTHON ###
+### -- PYTHON: ###
 Find which version of python is on the system:
 ```bash
 which python
@@ -24,7 +24,7 @@ reset
 export TERM=xterm-256color
 ```
 
-  - ### '/usr/bin/script -qc /bin/bash /dev/null' ###
+### -- '/usr/bin/script -qc /bin/bash /dev/null': ###
 This is another alternative to spawning a pty with Python. We then need to background the session and use our 'stty raw -echo' etc, as with the Python stabilisation.
 
 Should you wish to have the number of columns and rows displaying to you match your terminal, run 'stty size' on your local machine.
@@ -36,7 +36,7 @@ stty rows <row-num> columns <column-num>
 - ## Enumeration ##
 Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to. This is useful information to know for later enumeration.
 
-  - ### Find Command ###
+### -- Find Command: ###
 Once we know our username, user id, and group names and ids, we can begin enumeration with the find command. 
 
   - #### Files we own: ####
@@ -59,36 +59,27 @@ We can replace '-writable' with '-readable' also, as well as changing '-type f' 
 find / -type f -name *.<ext> 2>/dev/null
 ```
 
+
 We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result is filled into the {}).
-
 It is worth noting that we can pipe (|) into 'grep -v '<str1>\|<str2>...' to filter out results we do not want.
-
 A useful thing to do is redirect the results to a file (/tmp is typically a word writeable directory), and then go through.
 
 
-### Useful Files and Directories to Check- ###
-#### DIRECTORIES: ####
-/home/* - all users home directories
-/var/backups - typical back up folder
-/tmp - temporary storage for system processes
-/var/tmp - temporary storage for system processes
-/opt - additional packages/software
-/var/mail - mail directory
+### -- Useful Files and Directories to Check: ###
+  - #### DIRECTORIES: ####
+    - /home/* - all users home directories
+    - /home/*/.ssh - if we can write to a user's ssh directrory, or create one then we can gain a foothold as a different user
+    - /var/backups - typical back up folder
+    - /tmp - temporary storage for system processes
+    - /var/tmp - temporary storage for system processes
+    - /opt - additional packages/software
+    - /var/mail - mail directory
 
-#### FILES: ####
-/etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. 
-If writeable we can duplicate the root users line and just generate a password hash with:
-'openssl passwd -1 -salt <salt> <password>', and place it in the position of the password. 
-
-/etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entry.
-If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with:
-'echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers'
-
-/home/*/.ssh/id_rsa - this is a users ssh private key and if we can access it, we can copy to our system and ssh in as that user.
-
-/home/*/.ssh/authorized_keys - if this file is writeable, we can add our own public key to it.
-
-If we can make a directory of .ssh and then create an authorized_key file for the user.
+  - #### FILES: ####
+    - /etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>``` and place it in the position of the password. 
+    - /etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entry.If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with: ```bash echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ```
+    - /home/*/.ssh/id_rsa - this is a users ssh private key and if we can access it, we can copy to our system and ssh in as that user.
+    - /home/*/.ssh/authorized_keys - if this file is writeable, we can add our own public key to it. Also, If we can make a directory of .ssh and then create an authorized_key file for the user.
 
 
 ### Suid Files: ###
