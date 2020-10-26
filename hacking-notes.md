@@ -2,7 +2,7 @@
 - ## Shell Stabilisation ##
 In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
 
-  - **PYTHON**
+  - ### PYTHON ###
 Find which version of python is on the system:
 ```bash
 which python;
@@ -23,7 +23,8 @@ reset;
 export TERM=xterm-256color;
 ```
 
-  - **'/usr/bin/script -qc /bin/bash /dev/null'**
+
+  - ### '/usr/bin/script -qc /bin/bash /dev/null' ###
 is another alternative to spawning a pty with Python.
 We then need to background the session and use our 'stty raw -echo' etc.
 
