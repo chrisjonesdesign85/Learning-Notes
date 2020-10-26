@@ -1,8 +1,8 @@
-# - << LINUX >> -
-## -Shell Stabilisation- ##
-  - In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
+# << LINUX >> #
+## -Shell Stabilisation ##
+  -  In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
 
-### -PYTHON- ###
+### -  PYTHON- ###
 'which python' - find which version of python is on the system.
 'python -c 'import pty;pty.spawn("/bin/bash")''
 
