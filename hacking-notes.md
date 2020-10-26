@@ -11,12 +11,13 @@ The following means that CTRL+C doesnt close our shell, and also gives us autoco
 ```bash
 python -c 'import pty;pty.spawn("/bin/bash")'
 ```
-< BACKGROUND NC SESSION WITH CTRL+Z >
+**< BACKGROUND NC SESSION WITH CTRL+Z >**
 ```bash
 stty raw -echo
 fg
 ```
-< HIT ENTER A FEW TIMES >
+**< HIT ENTER A FEW TIMES >**
+
 Set the terminal to deal with things - if 256 colour doesnt work then just use 'xterm'.
 ```bash
 reset
