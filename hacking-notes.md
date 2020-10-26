@@ -1,27 +1,29 @@
 # << LINUX >> #
-## Shell Stabilisation ##
-  - In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
+- ## Shell Stabilisation ##
+In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
 
-### -  PYTHON ###
+  - **PYTHON**
 Find which version of python is on the system:
 ```bash
-which python
+which python;
 ```
 The following means that CTRL+C doesnt close our shell, and also gives us autocomplete:
 ```bash
-'python -c 'import pty;pty.spawn("/bin/bash")''
+python -c 'import pty;pty.spawn("/bin/bash")';
+```
 < BACKGROUND NC SESSION WITH CTRL+Z >
-stty raw -echo
-fg
+```bash
+stty raw -echo;
+fg;
 ```
 < HIT ENTER A FEW TIMES >
 Set the terminal to deal with things - if 256 colour doesnt work then just use 'xterm'.
 ```bash
-reset
-export TERM=xterm-256color
+reset;
+export TERM=xterm-256color;
 ```
 
-### -'/usr/bin/script -qc /bin/bash /dev/null' ###
+  - **'/usr/bin/script -qc /bin/bash /dev/null'**
 is another alternative to spawning a pty with Python.
 We then need to background the session and use our 'stty raw -echo' etc.
 
@@ -30,7 +32,7 @@ The first number is the number of rows, the second the number of columns. Now, o
 'stty rows <row-num> columns <column-num>'.
 
 
-## -Enumeration- ##
+- ## Enumeration ##
 Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to.
 This is useful information to know for later enumeration.
 
