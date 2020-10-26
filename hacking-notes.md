@@ -83,17 +83,26 @@ A useful thing to do is redirect the results to a file (/tmp is typically a word
 
 
 ### Suid Files: ###
-'find / -perm -4000 2>/dev/null'
+List all files that you can access that have SUID permissions
+```bash
+find / -perm -4000 2>/dev/null
+```
 Check on https://gtfobins.github.io/ for anything useful. 
 Sometimes the results will contain something cutsom which you can go on to enumerate, reverse engineer, and exploit.
 
 ### Sudo Permissions: ###
-'sudo -l' - will list which files you have
+List which files you have sudo permissions for:
+```bash
+sudo -l
+```
 Check on https://gtfobins.github.io/ for anything useful. 
 Sometimes the results will contain something cutsom which you can go on to enumerate, reverse engineer, and exploit.
 
 ### Capabilities: ###
-'getcap -r / 2>/dev/null' - lists all capabilities that applications have.
+List all capabilities that applications have:
+```bash
+getcap -r / 2>/dev/null
+```
 Check on https://gtfobins.github.io/ for anything useful. 
 
 ### PATH Variable exploitation ###
