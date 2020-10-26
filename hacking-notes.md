@@ -5,22 +5,22 @@ In order to ensure that we dont accidentally lose our shell by using CTRL+C to e
   - ### -PYTHON ###
 Find which version of python is on the system:
 ```bash
-which python;
+which python
 ```
 The following means that CTRL+C doesnt close our shell, and also gives us autocomplete:
 ```bash
-python -c 'import pty;pty.spawn("/bin/bash")';
+python -c 'import pty;pty.spawn("/bin/bash")'
 ```
 < BACKGROUND NC SESSION WITH CTRL+Z >
 ```bash
-stty raw -echo;
-fg;
+stty raw -echo
+fg
 ```
 < HIT ENTER A FEW TIMES >
 Set the terminal to deal with things - if 256 colour doesnt work then just use 'xterm'.
 ```bash
-reset;
-export TERM=xterm-256color;
+reset
+export TERM=xterm-256color
 ```
 
   - ### -'/usr/bin/script -qc /bin/bash /dev/null' ###
