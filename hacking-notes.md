@@ -2,7 +2,7 @@
 - ## Shell Stabilisation ##
 In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
 
-  - ### PYTHON ###
+  - ### -PYTHON ###
 Find which version of python is on the system:
 ```bash
 which python;
@@ -23,35 +23,40 @@ reset;
 export TERM=xterm-256color;
 ```
 
-
-  - ### '/usr/bin/script -qc /bin/bash /dev/null' ###
-is another alternative to spawning a pty with Python.
-We then need to background the session and use our 'stty raw -echo' etc.
+  - ### -'/usr/bin/script -qc /bin/bash /dev/null' ###
+This is another alternative to spawning a pty with Python. We then need to background the session and use our 'stty raw -echo' etc, as with the Python stabilisation.
 
 Should you wish to have the number of columns and rows displaying to you match your terminal, run 'stty size' on your local machine.
 The first number is the number of rows, the second the number of columns. Now, on the remote shell, run:
-'stty rows <row-num> columns <column-num>'.
-
+```bash
+stty rows <row-num> columns <column-num>
+```
 
 - ## Enumeration ##
-Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to.
-This is useful information to know for later enumeration.
+Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to. This is useful information to know for later enumeration.
 
-### -Find Command- ###
+  - ### Find Command ###
 Once we know our username, user id, and group names and ids, we can begin enumeration with the find command. 
 
-#### -Files we own: ####
-'find / -user <our username> 2>/dev/null'
+  - #### -Files we own: ####
+```bash
+find / -user <our username> 2>/dev/null
+```
+  - #### -Files belonging to our group: ####
+```bash
+find / -group <group-name> 2>/dev/null
+```
 
-#### -Files belonging to our group: ####
-'find / -group <group-name> 2>/dev/null'
-
-#### -Files that we can write to: ####
-'find / -type f -writable 2>/dev/null'
+  - #### -Files that we can write to: ####
+```bash
+find / -type f -writable 2>/dev/null
+```
 We can replace '-writable' with '-readable' also, as well as changing '-type f' to '-type d' to search for directories. 
 
-#### -Files of a particular extension: ####
-'find / -type f -name *.<ext> 2>/dev/null'
+  - #### -Files of a particular extension: ####
+```bash
+find / -type f -name *.<ext> 2>/dev/null
+```
 
 We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result is filled into the {}).
 
