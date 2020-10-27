@@ -1,9 +1,39 @@
 # << LINUX NOTES >> #
-# CONTENTS: #
-[Shell Stabilisation](Shell Stabilisation)
-  [Python Shell Stabilisation](Shell Stabilisation)
 
+<details>
+<summary> CONTENTS: </summary>
 
+[Shell Stabilisation](Linux-Notes.md#shell-stabilisation)
+
+[Enumeration](Linux-Notes.md#enumeration)
+
+[Find Command](Linux-Notes.md#find-command)
+
+[Useful Files and Directories to Check](Linux-Notes.md#useful-files-and-directories-to-check)
+
+[Suid Files](Linux-Notes.md#suid-files)
+
+[Sudo](Linux-Notes.md#sudo)
+
+[Capabilities](Linux-Notes.md#capabilities)
+
+[PATH Variable Exploitation](Linux-Notes.md#path-varibale-exploitation)
+
+[Python Import Exploitation](Linux-Notes.md#python-import-exploitation)
+
+[Cron Jobs and Processes](Linux-Notes.md#cron-jobs)
+
+[Wildcard Exploitation](Linux-Notes.md#wildcard-exploitation)
+
+[Docker Group](Linux-Notes.md#docker)
+
+[LXD Group](Linux-Notes.md#lxd-group-privesc)
+
+[Kernel Exploits](Linux-Notes.md#kernel-exploits)
+
+[Transferring Files to and From Machines](Linux-Notes.md#transferring-files-on-and-off-linux-machines)
+
+</details>
 
 - ## Shell Stabilisation ##
   In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
