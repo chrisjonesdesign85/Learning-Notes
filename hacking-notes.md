@@ -60,7 +60,7 @@ find / -type f -name *.<ext> 2>/dev/null
 ```
 
 
-We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result is filled into the {}).
+We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result of find is filled into the {}).
 It is worth noting that we can pipe (|) into 'grep -v '<str1>\|<str2>...' to filter out results we do not want.
 A useful thing to do is redirect the results to a file (/tmp is typically a word writeable directory), and then go through.
 
@@ -74,10 +74,11 @@ A useful thing to do is redirect the results to a file (/tmp is typically a word
     - /var/tmp - temporary storage for system processes
     - /opt - additional packages/software
     - /var/mail - mail directory
+    -/var/www/* - web directory, often containing the web log file or database which we can look through for credentials.
 
   - #### *FILES:* ####
-    - /etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>``` and place it in the position of the password. 
-    - /etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entry.If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with: ```bash echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ```
+    - /etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>```, then place it in the position of the password. 
+    - /etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entries so that we may use and exploit. If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with: ```bash echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ```
     - /home/*/.ssh/id_rsa - this is a users ssh private key and if we can access it, we can copy to our system and ssh in as that user.
     - /home/*/.ssh/authorized_keys - if this file is writeable, we can add our own public key to it. Also, If we can make a directory of .ssh and then create an authorized_key file for the user.
 
@@ -97,15 +98,25 @@ sudo -l
 ```
 Check on https://gtfobins.github.io/ for anything useful. 
 Sometimes the results will contain something cutsom which you can go on to enumerate, reverse engineer, and exploit.
+If the output is something like 'ALL = (jones) /usr/local/bin/mycommand', then we can run 'mycommand' as the 'jones' user. We do this with:
+```bash
+sudo -u jones /usr/local/bin/mycommand
+```
 
 ### *Capabilities:* ###
 List all capabilities that applications have:
 ```bash
 getcap -r / 2>/dev/null
 ```
-Check on https://gtfobins.github.io/ for anything useful. 
+Check on https://gtfobins.github.io/ for anything useful.
+'cap_setuid' is an interesting capability. Even though the program is not a SUID file itslef, it has permissions to run code that sets the user id, and group id.
+'ep' is another interesting capability, meaning the binary has all capabilities.
 
 ### *PATH Variable Exploitation* ###
+When we have access to a binary that is SUID or that you have Sudo accesses for, this obviously allows for a privilege escalation vector (whether lateral or upwards). Even better if we have access to the code behind the binary... if not we can reverse engineer it, running it to find out what it is doing, or decompiling in Ghidra, and analysing. The main thing we are looking for, is a command that is run without its full path. For example running 'date' rather than '/usr/bin/date'.
+
+
+Linux looks for binaries in a way which makes it exploitable.
 
 ### *Python Import Exploitation* ###
 
