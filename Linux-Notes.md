@@ -1,7 +1,8 @@
 # << LINUX NOTES >> #
 
+# CONTENTS #
 <details>
-<summary> CONTENTS: </summary>
+<summary> Toggle Contents: </summary>
 
 [Shell Stabilisation](Linux-Notes.md#shell-stabilisation)
 
