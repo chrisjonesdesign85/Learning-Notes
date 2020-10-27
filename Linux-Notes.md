@@ -1,6 +1,7 @@
 # << LINUX NOTES >> #
 # CONTENTS: #
-[Shell Stabilisation](/shell-stabilisation)
+[Shell Stabilisation](Shell Stabilisation)
+  [Python Shell Stabilisation](Shell Stabilisation)
 
 
 
