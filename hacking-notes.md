@@ -34,7 +34,7 @@ stty rows <row-num> columns <column-num>
 ```
 
 - ## Enumeration ##
-Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to. This is useful information to know for later enumeration.
+Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to. This is useful information to know for later enumeration. We should also check the 'history' command and the user history files to see if anything important has been run that can clue us in (or even passwords entered on the command line).
 
 ### *Find Command:* ###
 Once we know our username, user id, and group names and ids, we can begin enumeration with the find command. 
@@ -123,6 +123,9 @@ export PATH=/tmp:$PATH
 ```
 
 ### *Python Import Exploitation* ###
+In a similar way to PATH exploitation, we can exploit the way in which python programs import modules or libraries too...
+
+Python will look in the current folder with the rest fo the .py code files. It then goes off to the python root folder (/usr/local/python*). If these are writeable, or the folder is writeable by us then we can create our own code to be imported and run. Alternatively, we can check the PYTHONPATH environment variable to specify where it imports from, and perhaps change this. This videos shows this: https://www.youtube.com/watch?v=ZwYqDZOvUpY&feature=emb_title
 
 ### *Cron Jobs* ###
 
