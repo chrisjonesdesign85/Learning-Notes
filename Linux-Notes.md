@@ -242,7 +242,7 @@
 
   ## *Transferring Files On and Off Linux Machines:* ##
     - ### *Python* ###
-      ```
+      ```bash
       # Change to the folder that the file is in.
       python -m SimpleHTTPServer 8080
       python3 -m http.server 8080
