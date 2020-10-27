@@ -116,13 +116,19 @@ Check on https://gtfobins.github.io/ for anything useful.
 When we have access to a binary that is SUID or that you have Sudo accesses for, this obviously allows for a privilege escalation vector (whether lateral or upwards). Even better if we have access to the code behind the binary... if not we can reverse engineer it, running it to find out what it is doing, or decompiling in Ghidra, and analysing. The main thing we are looking for, is a command that is run without its full path. For example running 'date' rather than '/usr/bin/date'.
 
 
-Linux looks for binaries in a way which makes it exploitable.
+Linux looks for binaries in a way which makes it exploitable. It will look in the user's PATH variable, which contains a lists of directories. Therefore, if we prepend '/tmp:' to the beginning of the PATH variable, then make our own 'date' file that is executable in the /tmp folder, we can make the program run whatever code we wish, with privileges of the user which the program runs as.
+
+```bash
+export PATH=/tmp:$PATH
+```
 
 ### *Python Import Exploitation* ###
 
 ### *Cron Jobs* ###
 
 ### *Running Proccesses* ###
+
+### *Wildcard Exploitation* ###
 
 ### *Docker* ###
 
