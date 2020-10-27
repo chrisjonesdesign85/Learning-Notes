@@ -25,7 +25,7 @@
     ```
 
   ### *'/usr/bin/script -qc /bin/bash /dev/null':* ###
-    This is another alternative to spawning a pty with Python. We then need to background the session and use our 'stty raw -echo' etc, as with the Python stabilisation.
+    This is another alternative to spawning a pty instead of with Python. We then need to background the session and use our 'stty raw -echo' etc, as with the Python stabilisation.
 
     Should you wish to have the number of columns and rows displaying to you match your terminal, run 'stty size' on your local machine.
     The first number is the number of rows, the second the number of columns. Now, on the remote shell, run:
