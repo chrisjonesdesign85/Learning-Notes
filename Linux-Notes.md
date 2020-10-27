@@ -1,41 +1,6 @@
 # << LINUX NOTES >> #
 
 # CONTENTS #
-<details>
-<summary> Toggle Contents: </summary>
-
-
-[Shell Stabilisation](Linux-Notes.md#shell-stabilisation)
-
-[Enumeration](Linux-Notes.md#enumeration)
-
-[Find Command](Linux-Notes.md#find-command)
-
-[Useful Files and Directories to Check](Linux-Notes.md#useful-files-and-directories-to-check)
-
-[Suid Files](Linux-Notes.md#suid-files)
-
-[Sudo](Linux-Notes.md#sudo)
-
-[Capabilities](Linux-Notes.md#capabilities)
-
-[PATH Variable Exploitation](Linux-Notes.md#path-varibale-exploitation)
-
-[Python Import Exploitation](Linux-Notes.md#python-import-exploitation)
-
-[Cron Jobs and Processes](Linux-Notes.md#cron-jobs)
-
-[Wildcard Exploitation](Linux-Notes.md#wildcard-exploitation)
-
-[Docker Group](Linux-Notes.md#docker)
-
-[LXD Group](Linux-Notes.md#lxd-group-privesc)
-
-[Kernel Exploits](Linux-Notes.md#kernel-exploits)
-
-[Transferring Files to and From Machines](Linux-Notes.md#transferring-files-on-and-off-linux-machines)
-
-</details>
 
 - ## Shell Stabilisation ##
   In order to ensure that we dont accidentally lose our shell by using CTRL+C to end a process, we stabilise it. Stabilising also gives us the ability to run sudo, and use things like nano (as we need a pty for that).
@@ -72,7 +37,9 @@
     ```
 
 - ## Enumeration ##
-  Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to. This is useful information to know for later enumeration. We should also check the 'history' command and the user history files to see if anything important has been run that can clue us in (or even passwords entered on the command line).
+  Probably the first command you want to run is 'id'. This will tell you your username, and what groups you belong to. This is useful information to know for later enumeration. 
+  
+We should also check the 'history' command and the user history files to see if anything important has been run that can clue us in (or even passwords entered on the command line).
 
   ### *Find Command:* ###
     Once we know our username, user id, and group names and ids, we can begin enumeration with the find command. 
@@ -96,7 +63,18 @@
       ```bash
       find / -type f -name *.<ext> 2>/dev/null
       ```
-
+    - #### *Finding Useful items:* ####
+    ```bash
+      PASSWORD INFO
+      grep -rnw '/' -ie "pass" 2>/dev/null #Search for any files containing the string pass. also search for pass*= to count password= passwd= etc.
+      
+      #SSH KEYS
+      find / -name authorized_keys -exec ls -la {} \;
+      find / -name id_rsa -exec ls -la {}; cat {} \;
+      find / -name *ssh* -exec ls -la {} \;
+      
+      
+    ```
 
     We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result of find is filled into the {}).
     It is worth noting that we can pipe (|) into 'grep -v '<str1>\|<str2>...' to filter out results we do not want.
@@ -112,10 +90,11 @@
       - /var/tmp - temporary storage for system processes
       - /opt - additional packages/software
       - /var/mail - mail directory
-      -/var/www/* - web directory, often containing the web log file or database which we can look through for credentials.
+      - /var/www/* - web directory, often containing the web log file or database which we can look through for credentials.
 
     - #### *FILES:* ####
       - /etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>```, then place it in the position of the password. 
+      - /etc/group - cat this to find a list of groups and which users are in which group.
       - /etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entries so that we may use and exploit. If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with: ```bash echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ```
       - /home/*/.ssh/id_rsa - this is a users ssh private key and if we can access it, we can copy to our system and ssh in as that user.
       - /home/*/.ssh/authorized_keys - if this file is writeable, we can add our own public key to it. Also, If we can make a directory of .ssh and then create an authorized_key file for the user.
@@ -136,7 +115,7 @@
     sudo -l
     ```
     Check on https://gtfobins.github.io/ for anything useful. 
-    Sometimes the results will contain something cutsom which you can go on to enumerate, reverse engineer, and exploit.
+    Sometimes the results will contain something custom which you can go on to enumerate, reverse engineer, and exploit.
     If the output is something like 'ALL = (jones) /usr/local/bin/mycommand', then we can run 'mycommand' as the 'jones' user. We do this with:
     ```bash
     sudo -u jones /usr/local/bin/mycommand
@@ -175,7 +154,7 @@
     Python will look in the current folder with the rest fo the .py code files. It then goes off to the python root folder (/usr/local/python*). If these are writeable, or the folder is writeable by us then we can create our own code to be imported and run. Alternatively, we can check the PYTHONPATH environment variable to specify where it imports from, and perhaps change this if we are given permission to do so. This videos shows this: https://www.youtube.com/watch?v=ZwYqDZOvUpY&feature=emb_title
 
 
-  ### *Cron Jobs:* ###
+  ### *Processes:* ###
     To quickly find sechedules tasks, we can run donwload and run [pspy](https://github.com/DominicBreuker/pspy). This tells us all processes that are running. Using the -i flag, we can specify how often the scan should occur in milliseconds.
 
     Other useful commands:
@@ -185,6 +164,9 @@
     cat /etc/cron*
 
     systemctl list-timers --all
+    
+    ps -aux #List all services running.
+    ps -eaf --forest #Shows in a nice format, and clearly shows children processes.
      ```
 
 
@@ -235,11 +217,35 @@
 
   ### *KERNEL EXPLOITS:* ###
     ```bash
-    uname -a
+    #Show Kernel information:
+    uname -a 
+    cat /proc/version
+    
+    #Find the machines architecture (64 bit, 32 bit, number of CPUs)
+    lscpu 
     ```
     The above will show you the kernel version you are running. It is now as striaghtforward as searching for exploits on exploitdb, or using searchsploit.
 
-
+  ## *Internal Network Enumeration:* ##
+    ```bash
+    #Shows ip information
+    ifconfig 
+    ip a
+    
+    #Show routing information
+    route
+    ip route
+    
+    #Arp information
+    arp -a
+    ip neigh
+    
+    #Show which ports are available/operational on the machine
+    #We are looking for 127.0.0.1:<port num> to tell us that there is a port open only for the localhost. 
+    netstat -ano
+    ```
+    
+    
   ## *Transferring Files On and Off Linux Machines:* ##
     - ### *Python* ###
       ```bash
