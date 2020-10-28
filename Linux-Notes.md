@@ -253,6 +253,11 @@ cat /proc/net/arp
 netstat -ano
 ```
 
+Should there be any information from netstat (a port only open to localhost), we can create a port forward/tunnel with [SOCAT](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/socat), using the command below to forward our traffic on to the local port:
+```bash
+socat tcp-listen:8001,reuseaddr,fork tcp:localhost:22 #opens port 8001 and any traffic received onto that port will be forwarded onto localhost port 22. In this case, allowing a locally only available ssh port to work through port 8001 of the machine from externally.
+```
+
 
 ## *Transferring Files On and Off Linux Machines:* ##
 - ### *Python* ###
