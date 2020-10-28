@@ -233,6 +233,7 @@ lscpu
 ```
 The above will show you the kernel version you are running. It is now as striaghtforward as searching for exploits on exploitdb, or using searchsploit.
 
+
 ## *Internal Network Enumeration:* ##
 ```bash
 #Shows ip information
@@ -253,9 +254,18 @@ cat /proc/net/arp
 netstat -ano
 ```
 
-Should there be any information from netstat (a port only open to localhost), we can create a port forward/tunnel with [SOCAT](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/socat), using the command below to forward our traffic on to the local port:
+## *Port Forwarding/Tunnelling:* ##
+Should there be any information from netstat (a port only open to localhost for example), we can create a port forward/tunnel with [SOCAT](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/socat), using the command below to forward our traffic on to the local port:
+
 ```bash
-socat tcp-listen:8001,reuseaddr,fork tcp:localhost:22 #opens port 8001 and any traffic received onto that port will be forwarded onto localhost port 22. In this case, allowing a locally only available ssh port to work through port 8001 of the machine from externally.
+socat tcp-listen:8001,reuseaddr,fork tcp:localhost:22 #opens port 8001 and any traffic received onto that port will be forwarded onto localhost port 22. 
+#In this case, allowing a locally only available ssh port to work through port 8001 of the machine from externally.
+
+#Similar can also be achieved with ssh if it is enabled (and we have a password):
+ssh -L 9000:imgur.com:80 user@0.0.0.0.
+#-L is a local tunnel (YOU <-- CLIENT). You can forward a connection back to you. Going to localhost:9000 on your machine, will load imgur traffic using your other server.
+
+-R is a remote tunnel (YOU --> CLIENT). You forward your traffic to the other server for others to view. Similar to the example above, but in reverse.
 ```
 
 
