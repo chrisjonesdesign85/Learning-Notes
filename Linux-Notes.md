@@ -265,7 +265,7 @@ socat tcp-listen:8001,reuseaddr,fork tcp:localhost:22 #opens port 8001 and any t
 ssh -L 9000:imgur.com:80 user@0.0.0.0.
 #-L is a local tunnel (YOU <-- CLIENT). You can forward a connection back to you. Going to localhost:9000 on your machine, will load imgur traffic using your other server.
 
--R is a remote tunnel (YOU --> CLIENT). You forward your traffic to the other server for others to view. Similar to the example above, but in reverse.
+#-R is a remote tunnel (YOU --> CLIENT). You forward your traffic to the other server for others to view. Similar to the example above, but in reverse.
 ```
 
 
