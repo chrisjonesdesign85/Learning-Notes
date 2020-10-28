@@ -93,7 +93,7 @@ A useful thing to do is redirect the results to a file (/tmp is typically a word
       - /var/www/* - web directory, often containing the web log file or database which we can look through for credentials.
 
   - #### *FILES:* ####
-      - /etc/passwd - cat and pipe into 'grep /bin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>```, then place it in the position of the password. 
+      - /etc/passwd - cat and pipe into 'grep -v nologin' to find names of all users on the box that have shells. If writeable we can duplicate the root users line and just generate a password hash with: ```bash openssl passwd -1 -salt <salt> <password>```, then place it in the position of the password. 
       - /etc/group - cat this to find a list of groups and which users are in which group.
       - /etc/sudoers - we may be able to read sudo permissions of users without using sudo -l, hoping for a NOPASSWD entries so that we may use and exploit. If this file is writeable, we can append this line to give ourselves sudo access to all commands to privesc with: ```bash echo "<username> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ```
       - /home/*/.ssh/id_rsa - this is a users ssh private key and if we can access it, we can copy to our system and ssh in as that user.
@@ -246,6 +246,7 @@ ip route
 #Arp information
 arp -a
 ip neigh
+cat /proc/net/arp
 
 #Show which ports are available/operational on the machine
 #We are looking for 127.0.0.1:<port num> to tell us that there is a port open only for the localhost. 
